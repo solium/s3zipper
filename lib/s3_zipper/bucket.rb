@@ -5,16 +5,19 @@ module S3Zipper
     attr_accessor :files, :bucket, :filename, :options
 
     def initialize(bucket)
-      @bucket  = bucket
+      @bucket = bucket
     end
 
-    def zip_files(files, filename: "#{SecureRandom.hex}.zip")
-      self.filename = Tempfile.new(filename).path
-      self.files    = files
-      progress_bar  = ProgressBar.create(format: '%t %e |%b>%i| %p% %c/%C', total: files.count, title: 'Zipping Files', length: 80)
-      self.files    = files.partition do |key|
+    def zip_files(files, filename: SecureRandom.hex)
+      temp               = Tempfile.new([filename, '.zip'])
+      self.filename      = temp.path
+      self.files         = files
+      progress_bar       = ProgressBar.create(format: "'#{self.filename}' %e %p% %c/%C %t", total: files.count, length: 80, autofinish: false)
+      self.files         = files.partition do |key|
+        progress_bar.title = "Key: #{key}"
+        progress_bar.refresh
         file = download(key) do |file|
-          Zip::File.open(filename, Zip::File::CREATE) do |zipfile|
+          Zip::File.open(self.filename, Zip::File::CREATE) do |zipfile|
             zipfile.add(key, file)
           end
         end
@@ -22,7 +25,11 @@ module S3Zipper
         progress_bar&.increment
         file.present?
       end
-      upload(filename, "#{filename}")
+      progress_bar.title = ''
+      progress_bar.refresh
+      progress_bar.finish
+      upload
+      temp.unlink
       results
     end
 
@@ -45,7 +52,7 @@ module S3Zipper
       temp.unlink
     end
 
-    def upload local_path, repo_path, bucket = self.bucket
+    def upload local_path: self.filename, repo_path: self.filename, bucket: self.bucket
       Aws::S3::Resource.new.bucket(bucket).object(repo_path).upload_file local_path
     end
   end
