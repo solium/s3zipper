@@ -1,7 +1,7 @@
 require 'ruby-progressbar'
 class Progress
   def initialize options = {}
-    return if options[:disable]
+    return unless options[:enabled]
     @options      = options
     @title        = options[:title]
     @total        = options[:total]

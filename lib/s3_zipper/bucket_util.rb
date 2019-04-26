@@ -2,11 +2,12 @@ require 's3_zipper/progress'
 
 class S3Zipper
   class BucketUtil
-    attr_accessor :bucket_name, :s3
+    attr_accessor :bucket_name, :s3, :options
 
-    def initialize bucket_name
+    def initialize bucket_name, options = {}
       @bucket_name = bucket_name
       @s3          = Aws::S3::Client.new
+      @options = options
     end
 
     def download key
@@ -33,7 +34,7 @@ class S3Zipper
     end
 
     def upload local_path, repo_path
-      pb = Progress.new(format: '%t %i', title: "Uploading '#{local_path}' to '#{repo_path}'", length: 120)
+      pb = Progress.new(enabled: options[:progress], format: '%t %i', title: "Uploading '#{local_path}' to '#{repo_path}'", length: 120)
       Aws::S3::Resource.new.bucket(bucket_name).object(repo_path).upload_file local_path
       pb.finish(title: "Uploaded '#{local_path}' to '#{repo_path}'")
     end

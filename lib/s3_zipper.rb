@@ -7,14 +7,14 @@ class S3Zipper
   attr_accessor :keys, :bucket, :options, :zipfile
 
   def initialize bucket, options = {}
-    @bucket  = BucketUtil.new(bucket)
     @options = options
+    @bucket  = BucketUtil.new(bucket, options)
   end
 
   def zip_files keys, filename: SecureRandom.hex
     self.zipfile = ZipFile.new(filename)
     self.keys    = keys
-    pb           = Progress.new(format: "'#{zipfile.path}' %e %p% %c/%C %t", total: keys.count, length: 80, autofinish: false)
+    pb           = Progress.new(enabled: options[:progress], format: "'#{zipfile.path}' %e %p% %c/%C %t", total: keys.count, length: 80, autofinish: false)
     keys.each_with_object({ zipped: [], failed: [] }) do |key, hash|
       pb.update 'title', "Key: #{key}"
       bucket.download_to_tempfile(key) do |file|
