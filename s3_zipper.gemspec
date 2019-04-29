@@ -1,13 +1,12 @@
-
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "s3_zipper/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "s3_zipper"
-  spec.version       = S3Zipper::VERSION
-  spec.authors       = ["Nickolas Komarnitsky"]
-  spec.email         = ["komarnickolas@gmail.com"]
+  spec.name    = "s3_zipper"
+  spec.version = S3Zipper::VERSION
+  spec.authors = ["Nickolas Komarnitsky"]
+  spec.email   = ["komarnickolas@gmail.com"]
 
   spec.summary     = %q{Gem for zipping files in s3}
   spec.description = %q{}
@@ -39,7 +38,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rake-compiler"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_dependency 'aws-sdk', '~> 2'
+  spec.add_development_dependency "simplecov"
+  spec.add_dependency 'aws-sdk-s3'
   spec.add_dependency 'rubyzip'
   spec.add_dependency 'ruby-progressbar'
 end
