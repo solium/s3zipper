@@ -7,7 +7,7 @@ class S3Zipper
     def initialize bucket_name, options = {}
       @bucket_name = bucket_name
       @s3          = Aws::S3::Client.new
-      @options = options
+      @options     = options
     end
 
     def download key
