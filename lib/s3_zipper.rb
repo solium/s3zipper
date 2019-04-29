@@ -15,12 +15,12 @@ class S3Zipper
     self.zipfile = ZipFile.new(filename)
     self.keys    = keys
     pb           = Progress.new(enabled: options[:progress], format: "'#{zipfile.path}' %e %p% %c/%C %t", total: keys.count, length: 80, autofinish: false)
-    keys.each_with_object({ zipped: [], failed: [] }) do |key, hash|
+    self.keys    = keys.each_with_object({ zipped: [], failed: [] }) do |key, hash|
       pb.update 'title', "Key: #{key}"
       bucket.download_to_tempfile(key) do |file|
         hash[:failed] << key if file.nil?
         zipfile.add(key, file)
-        hash[:zipped] << file
+        hash[:zipped] << key
       end
       pb.increment
       yield(pb.progress) if block_given?
@@ -33,6 +33,6 @@ class S3Zipper
   private
 
   def results
-    { filename: zipfile.filename }.merge(%i[zipped failed].zip(keys).to_h)
+    { filename: zipfile.filename }.merge(keys)
   end
 end
