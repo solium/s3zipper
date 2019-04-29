@@ -24,7 +24,7 @@ Or install it yourself as:
 
 ```ruby
 zipper = S3Zipper.new(ENV['AWS_BUCKET'])
-files = ['/documents/1/1/original.pdf','/documents/1/2/original.pdf','/documents/1/3/original.pdf']
+files = ["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg", "documents/files/790/307/029/original/background-10.jpg", "documents/files/790/307/031/original/background-11.jpg", "documents/files/790/307/077/original/background-11.jpg", "documents/files/790/306/983/original/background-11.jpg", "documents/files/790/306/986/original/background-12.jpg", "documents/files/790/307/078/original/background-12.jpg", "documents/files/790/307/032/original/background-12.jpg", "documents/files/790/306/987/original/background-13.jpg"]
 zipper.zip_files(files)
 {
   :filename=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
