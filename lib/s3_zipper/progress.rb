@@ -9,6 +9,18 @@ class Progress
     @progress_bar = ProgressBar.create(@options)
   end
 
+  def reset(title: nil, total: nil, format: nil)
+    @progress_bar.progress = 0
+    @progress_bar.title    = title
+    @progress_bar.total    = total
+    @progress_bar.format   = format
+    refresh
+  end
+
+  def refresh
+    @progress_bar.refresh
+  end
+
   def progress
     return unless @progress_bar
     @progress_bar.progress
