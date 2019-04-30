@@ -4,6 +4,10 @@ class S3Zipper
   class Client
     attr_accessor :bucket_name, :s3, :options, :pb
 
+    # @param [String] bucket_name - bucket that files exist in
+    # @param [Hash] options - options for zipper
+    # @option options [Boolean] :progress - toggles progress tracking
+    # @return [S3Zipper::Client]
     def initialize bucket_name, options = {}
       @bucket_name = bucket_name
       @s3          = options[:client] || ::Aws::S3::Client.new

@@ -15,6 +15,10 @@ class S3Zipper
     @client  = Client.new(bucket, options)
   end
 
+  # Zips files from s3 to a local zip
+  # @param [Array] keys - Array of s3 keys to zip
+  # @param [String, File] file - Filename or file object for the zip, defaults to a random string
+  # @return [Hash]
   def zip_to_local_file(keys, file: SecureRandom.hex)
     file = file.is_a?(File) ? file : File.open("#{file}.zip", 'w')
     zip keys, file.path do |progress|
@@ -22,23 +26,38 @@ class S3Zipper
     end
   end
 
-  def zip_to_tempfile(keys, filename: SecureRandom.hex)
+  # Zips files from s3 to a temporary zip
+  # @param [Array] keys - Array of s3 keys to zip
+  # @param [String, File] filename - Name of file, defaults to a random string
+  # @return [Hash]
+  def zip_to_tempfile(keys, filename: SecureRandom.hex, cleanup: false)
     zipfile = Tempfile.new([filename, '.zip'])
-    result  = zip(keys, zipfile.path)
-    yield(zipfile, result) if block_given?
-    zipfile.unlink
+    result  = zip(keys, zipfile.path) { |progress| yield(zipfile, progress) if block_given? }
+    zipfile.unlink if cleanup
     result
   end
 
+  # Zips files from s3 to a temporary file, pushes that to s3, and then cleans up
+  # @param [Array] keys - Array of s3 keys to zip
+  # @param [String, File] filename - Name of file, defaults to a random string
+  # @param [String] path - path for file in s3
+  # @return [Hash]
   def zip_to_s3 keys, filename: SecureRandom.hex, path: nil
-    zip_to_tempfile(keys, filename: filename) do |zipfile, result|
-      result[:filename] = "#{path ? "#{path}/" : ''}#{filename}.zip"
-      client.upload(zipfile.path, result[:filename])
+    filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
+    result   = zip_to_tempfile(keys, filename: filename, cleanup: false) do |_, progress|
+      yield(progress) if block_given?
     end
+    client.upload(result[:filename], filename)
+    result[:filename] = filename
+    result
   end
 
   private
 
+  # @param [Array] keys - Array of s3 keys to zip
+  # @param [String] path - path to zip
+  # @yield [progress]
+  # @return [Hash]
   def zip(keys, path)
     failed, successful = client.download_keys keys
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
