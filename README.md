@@ -1,8 +1,6 @@
 # S3Zipper
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/s3_zipper`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This is a gem for zipping files stored in Amazon S3
 
 ## Installation
 
@@ -23,7 +21,7 @@ Or install it yourself as:
 ## Usage
 ```ruby
 require 's3_zipper'
-zipper = S3Zipper.new('documents')
+zipper = S3Zipper.new('bucket_name')
 ```
 ### Zip to local file
 ```ruby
