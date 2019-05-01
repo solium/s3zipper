@@ -47,8 +47,9 @@ class S3Zipper
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false) do |_, progress|
       yield(progress) if block_given?
     end
-    client.upload(result[:filename], filename)
-    result[:key] = result.delete(:filename)
+    client.upload(result.delete(:filename), filename)
+    result[:key] = filename
+    result[:url] = client.get_url(result[:key])
     result
   end
 

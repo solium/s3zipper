@@ -1,6 +1,6 @@
 # S3Zipper
 
-This is a gem for zipping files stored in Amazon S3
+This is a gem for zipping files stored in Amazo                                                                                                                                                                                                                                                                                                                                                                                             n S3
 
 ## Installation
 
@@ -40,6 +40,7 @@ keys = ["documents/files/790/306/985/original/background-10.jpg", "documents/fil
 zipper.zip_to_s3(keys)
 # {
 #   :key=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
+#   :url => "https://bucket_name.s3.us-west-2.amazonaws.com/35b6f0e2ee91aa0e3c0640c7a4b2b7db.zip" 
 #   :zipped=>["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"], 
 #   :failed=>[]
 # }
