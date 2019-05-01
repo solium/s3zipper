@@ -5,12 +5,12 @@ require "s3_zipper/version"
 Gem::Specification.new do |spec|
   spec.name    = "s3_zipper"
   spec.version = S3Zipper::VERSION
-  spec.authors = ["Nickolas Komarnitsky"]
-  spec.email   = ["komarnickolas@gmail.com"]
+  spec.authors = ["Capshare", 'Nickolas Komarnitsky']
+  spec.email   = [""]
 
   spec.summary     = %q{Gem for zipping files in s3}
   spec.description = %q{}
-  spec.homepage    = "https://github.com/Jypotheren734x/s3zipper"
+  spec.homepage    = "https://github.com/capshareinc/s3zipper"
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
     spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
     spec.metadata["homepage_uri"]    = spec.homepage
-    spec.metadata["source_code_uri"] = "https://github.com/Jypotheren734x/s3zipper"
+    spec.metadata["source_code_uri"] = "https://github.com/capshareinc/s3zipper"
   else
     raise "RubyGems 2.0 or newer is required to protect against " \
       "public gem pushes."
