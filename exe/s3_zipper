@@ -1,3 +1,24 @@
 #!/usr/bin/env ruby
 
 require "s3_zipper"
+require 'thor'
+require 'awesome_print'
+class CLI < Thor
+  desc 'local_file FILES', 'zip files from s3 to a local file'
+  method_option :filename, type: :string, aliases: 'f', desc: 'Name of the created zip archive'
+  method_option :bucket, type: :string, default: ENV['AWS_BUCKET'], required: !ENV['AWS_BUCKET'].nil?, aliases: 'b', desc: 'Name of the bucket the files are in'
+
+  def local_file(*files)
+    S3Zipper.new(options[:bucket]).zip_to_local_file(files, file: options[:filename] || SecureRandom.hex)
+  end
+
+  desc 's3 FILES', 'zip files from s3 to s3'
+  method_option :filename, type: :string, aliases: 'f', desc: 'Name of the created zip archive'
+  method_option :path, type: :string, aliases: 'p', desc: 'Path to the file in s3'
+  method_option :bucket, type: :string, default: ENV['AWS_BUCKET'], required: !ENV['AWS_BUCKET'].nil?, aliases: 'b', desc: 'Name of the bucket the files are in'
+
+  def s3(*files)
+    S3Zipper.new(options[:bucket]).zip_to_s3(files, filename: options[:filename] || SecureRandom.hex, path: options[:path])
+  end
+end
+CLI.start(ARGV)

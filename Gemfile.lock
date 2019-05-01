@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    s3_zipper (1.0.2)
+    s3_zipper (1.0.3)
       aws-sdk-s3 (~> 1)
       ruby-progressbar (~> 1)
       rubyzip (>= 1.0.0)
