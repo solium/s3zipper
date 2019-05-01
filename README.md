@@ -21,16 +21,30 @@ Or install it yourself as:
     $ gem install s3_zipper
 
 ## Usage
-
 ```ruby
-zipper = S3Zipper.new(ENV['AWS_BUCKET'])
-files = ["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg", "documents/files/790/307/029/original/background-10.jpg", "documents/files/790/307/031/original/background-11.jpg", "documents/files/790/307/077/original/background-11.jpg", "documents/files/790/306/983/original/background-11.jpg", "documents/files/790/306/986/original/background-12.jpg", "documents/files/790/307/078/original/background-12.jpg", "documents/files/790/307/032/original/background-12.jpg", "documents/files/790/306/987/original/background-13.jpg"]
-zipper.zip_to_local_file(files)
-{
-  :filename=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
-  :zipped=>["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg", "documents/files/790/307/029/original/background-10.jpg", "documents/files/790/307/031/original/background-11.jpg", "documents/files/790/307/077/original/background-11.jpg", "documents/files/790/306/983/original/background-11.jpg", "documents/files/790/306/986/original/background-12.jpg", "documents/files/790/307/078/original/background-12.jpg", "documents/files/790/307/032/original/background-12.jpg", "documents/files/790/306/987/original/background-13.jpg"], 
-  :failed=>[]
-}
+require 's3_zipper'
+zipper = S3Zipper.new('documents')
+```
+### Zip to local file
+```ruby
+keys = ["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"]
+zipper.zip_to_local_file(keys)
+# {
+#   :filename=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
+#   :zipped=>["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"], 
+#   :failed=>[]
+# }
+```
+
+### Zip to s3
+```ruby
+keys = ["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"]
+zipper.zip_to_s3(keys)
+# {
+#   :key=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
+#   :zipped=>["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"], 
+#   :failed=>[]
+# }
 ```
 
 ## Development

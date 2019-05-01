@@ -48,7 +48,7 @@ class S3Zipper
       yield(progress) if block_given?
     end
     client.upload(result[:filename], filename)
-    result[:filename] = filename
+    result[:key] = result.delete(:filename)
     result
   end
 
