@@ -13,20 +13,15 @@ class S3Zipper
       @client      = options[:client] || ::Aws::S3::Client.new
       @resource    = options[:resource] || ::Aws::S3::Resource.new
       @options     = options
-      @pb          = Progress.new(enabled: options[:progress], format: "%e %c/%C %t", total: nil, length: 80, autofinish: false)
     end
 
-    def download_keys keys
-      pb.reset(total: keys.count, title: 'Downloading Keys', format: "%e %c/%C %t")
+    def download_keys keys, cleanup: false
       keys = keys.map do |key|
-        pb.increment
-        pb.update 'title', "Downloading Key: #{key}"
-        temp = download_to_tempfile(key, cleanup: false)
+        temp = download_to_tempfile(key, cleanup: cleanup)
+        yield(temp, key) if block_given?
         [key, temp]
       end
-      keys = keys.partition { |_, temp| temp.nil? }
-      pb.finish(title: 'Downloaded Keys', format: '%e %c/%C %t')
-      keys
+      keys.partition { |_, temp| temp.nil? }
     end
 
     def download key
@@ -58,10 +53,7 @@ class S3Zipper
     end
 
     def upload local_path, repo_path
-      pb     = Progress.new(enabled: options[:progress], format: '%t', title: "Uploading '#{local_path}' to '#{repo_path}'", length: 120)
-      object = client.put_object(bucket: bucket_name, key: repo_path, body: File.open(local_path).read)
-      pb.finish(title: "Uploaded '#{local_path}' to '#{repo_path}'")
-      object
+      client.put_object(bucket: bucket_name, key: repo_path, body: File.open(local_path).read)
     end
   end
 end
