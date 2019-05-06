@@ -3,6 +3,7 @@ class Progress
   def initialize options = {}
     return unless options[:enabled] || true
     @options      = options
+    @format       = options[:format]
     @progress_bar = ProgressBar.create(@options)
   end
 
@@ -43,11 +44,10 @@ class Progress
     @progress_bar.send("#{attr}=", value)
   end
 
-  def finish title: @progress_bar.title, format: @progress_bar.title
+  def finish title: nil, format: nil
     return unless @progress_bar
-    @progress_bar.title  = title
-    @progress_bar.format = format
-    @progress_bar.refresh
+    @progress_bar.title  = title if title
+    @progress_bar.format = format if format
     @progress_bar.finish
   end
 
@@ -58,13 +58,5 @@ class Progress
   def get_attr attr
     return unless @progress_bar
     @progress_bar.send(attr)
-  end
-
-  def to_h
-    @progress_bar&.to_h
-  end
-
-  def method_missing(name, *args)
-    super unless @progress_bar.send(name, *args)
   end
 end
