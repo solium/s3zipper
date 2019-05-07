@@ -52,8 +52,8 @@ class S3Zipper
       resource.bucket(bucket_name).object(key).public_url
     end
 
-    def upload local_path, repo_path
-      client.put_object(bucket: bucket_name, key: repo_path, body: File.open(local_path).read)
+    def upload local_path, repo_path, options: {}
+      client.put_object(options.merge!(bucket: bucket_name, key: repo_path, body: File.open(local_path).read))
     end
   end
 end

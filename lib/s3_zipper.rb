@@ -41,12 +41,12 @@ class S3Zipper
   # @param [String, File] filename - Name of file, defaults to a random string
   # @param [String] path - path for file in s3
   # @return [Hash]
-  def zip_to_s3 keys, filename: SecureRandom.hex, path: nil, &block
+  def zip_to_s3 keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block
     progress.update :total, 1
     filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false, &block)
     progress.update_attrs title: "Uploading zip to s3", total: nil
-    client.upload(result.delete(:filename), filename)
+    client.upload(result.delete(:filename), filename, options: s3_options)
     progress.finish(title: "Uploaded zip to #{filename}")
     result[:key] = filename
     result[:url] = client.get_url(result[:key])
@@ -60,14 +60,14 @@ class S3Zipper
   # @yield [progress]
   # @return [Hash]
   def zip(keys, path)
-    progress.update_attrs total: progress.total + keys.size, title: 'Zipping Keys to #{path}'
+    progress.update_attrs total: progress.total + keys.size, title: "Zipping Keys to #{path}"
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
       @failed, @successful = client.download_keys keys do |file, key|
         progress.increment
         progress.update :title, "Zipping #{key} to #{path}"
         yield(zipfile, progress) if block_given?
         next if file.nil?
-        zipfile.add(key, file.path)
+        zipfile.add(File.basename(key), file.path)
       end
     end
     @successful.each { |_, temp| temp.unlink }
