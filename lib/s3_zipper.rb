@@ -75,6 +75,7 @@ class S3Zipper
     @successful.each { |_, temp| temp.unlink }
     {
       filename: path,
+      filesize: File.size(path),
       zipped:   @successful.map(&:first),
       failed:   @failed.map(&:first)
     }
