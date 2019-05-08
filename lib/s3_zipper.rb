@@ -60,7 +60,9 @@ class S3Zipper
   # @yield [progress]
   # @return [Hash]
   def zip(keys, path)
-    progress.update_attrs total: progress.total + keys.size, title: "Zipping Keys to #{path}"
+    total = progress.total || 0
+    total += keys.size
+    progress.update_attrs total: total, title: "Zipping Keys to #{path}"
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
       @failed, @successful = client.download_keys keys do |file, key|
         progress.increment

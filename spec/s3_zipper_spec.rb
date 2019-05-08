@@ -96,27 +96,30 @@ RSpec.describe S3Zipper do
     it 'zips all files' do
       result = zipper.zip_to_s3(keys, filename: 'test')
       expect(result).to eq({
-                             filename: 'test.zip',
-                             zipped:   keys,
-                             failed:   []
+                             key:    'test.zip',
+                             url:    "https://test.s3.us-west-2.amazonaws.com/test.zip",
+                             zipped: keys,
+                             failed: []
                            })
     end
 
     it 'zips some files' do
       result = zipper.zip_to_s3(keys + fake_keys, filename: 'test')
       expect(result).to eq({
-                             filename: 'test.zip',
-                             zipped:   keys,
-                             failed:   fake_keys
+                             key:    'test.zip',
+                             url:    "https://test.s3.us-west-2.amazonaws.com/test.zip",
+                             zipped: keys,
+                             failed: fake_keys
                            })
     end
 
     it 'zips no files' do
       result = zipper.zip_to_s3(fake_keys, filename: 'test')
       expect(result).to eq({
-                             filename: 'test.zip',
-                             zipped:   [],
-                             failed:   fake_keys
+                             key:    'test.zip',
+                             url:    "https://test.s3.us-west-2.amazonaws.com/test.zip",
+                             zipped: [],
+                             failed: fake_keys
                            })
     end
   end
