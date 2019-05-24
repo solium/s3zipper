@@ -6,16 +6,18 @@ require 's3_zipper/client'
 require 'zip'
 
 class S3Zipper
-  attr_accessor :client, :options, :progress
+  attr_accessor :client, :options, :progress, :zip_client
 
   # @param [String] bucket - bucket that files exist in
   # @param [Hash] options - options for zipper
   # @option options [Boolean] :progress - toggles progress tracking
   # @return [S3Zipper]
   def initialize(bucket, options = {})
-    @options  = options
-    @client   = Client.new(bucket, options)
-    @progress = Progress.new(enabled: options[:progress], format: '%e %c/%C %t', total: nil, length: 80, autofinish: false)
+    @options    = options
+    @progress   = Progress.new(enabled: options[:progress], format: '%e %c/%C %t', total: nil, length: 80, autofinish: false)
+    @client     = Client.new(bucket, options)
+    @zip_client = Client.new(options[:zip_bucket], options) if options[:zip_bucket]
+    @zip_client ||= @client
   end
 
   # Zips files from s3 to a local zip
@@ -46,7 +48,7 @@ class S3Zipper
   def zip_to_s3(keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block)
     filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false, &block)
-    client.upload(result.delete(:filename), filename, options: s3_options)
+    zip_client.upload(result.delete(:filename), filename, options: s3_options)
     result[:key] = filename
     result[:url] = client.get_url(result[:key])
     result
