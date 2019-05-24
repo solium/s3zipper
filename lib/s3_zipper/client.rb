@@ -60,6 +60,7 @@ class S3Zipper
       spinner = TTY::Spinner.new('[:spinner] :title', format: :pulse_3)
       spinner.update(title: "Uploading zip to #{repo_path}")
       spinner.auto_spin
+      fdsafadsfadsfasfasfsafasdf
       object = client.put_object(options.merge!(bucket: bucket_name, key: repo_path, body: File.open(local_path).read))
       spinner.update(title: "Uploaded zip to #{repo_path}")
       spinner.success
