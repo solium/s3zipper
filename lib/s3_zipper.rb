@@ -1,7 +1,9 @@
-require "s3_zipper/version"
+# frozen_string_literal: true
+
+require 's3_zipper/version'
 require 's3_zipper/progress'
-require "s3_zipper/client"
-require "zip"
+require 's3_zipper/client'
+require 'zip'
 
 class S3Zipper
   attr_accessor :client, :options, :progress
@@ -10,10 +12,10 @@ class S3Zipper
   # @param [Hash] options - options for zipper
   # @option options [Boolean] :progress - toggles progress tracking
   # @return [S3Zipper]
-  def initialize bucket, options = {}
+  def initialize(bucket, options = {})
     @options  = options
     @client   = Client.new(bucket, options)
-    @progress = Progress.new(enabled: options[:progress], format: "%e %c/%C %t", total: nil, length: 80, autofinish: false)
+    @progress = Progress.new(enabled: options[:progress], format: '%e %c/%C %t', total: nil, length: 80, autofinish: false)
   end
 
   # Zips files from s3 to a local zip
@@ -41,13 +43,10 @@ class S3Zipper
   # @param [String, File] filename - Name of file, defaults to a random string
   # @param [String] path - path for file in s3
   # @return [Hash]
-  def zip_to_s3 keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block
-    progress.update :total, 1
+  def zip_to_s3(keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block)
     filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false, &block)
-    progress.update_attrs title: "Uploading zip to s3", total: nil
     client.upload(result.delete(:filename), filename, options: s3_options)
-    progress.finish(title: "Uploaded zip to #{filename}")
     result[:key] = filename
     result[:url] = client.get_url(result[:key])
     result
@@ -65,10 +64,10 @@ class S3Zipper
     progress.update_attrs total: total, title: "Zipping Keys to #{path}"
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
       @failed, @successful = client.download_keys keys do |file, key|
-        progress.increment
-        progress.update :title, "Zipping #{key} to #{path}"
+        progress.increment title: "Zipping #{key} to #{path}"
         yield(zipfile, progress) if block_given?
         next if file.nil?
+
         zipfile.add(File.basename(key), file.path)
       end
     end
