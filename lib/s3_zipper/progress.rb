@@ -59,7 +59,6 @@ class Progress
   def update(attr, value)
     return unless @progress_bar
 
-    \
     @progress_bar.send("#{attr}=", value)
   end
 
