@@ -64,6 +64,8 @@ class S3Zipper
       spinner.update(title: "Uploaded zip to #{bucket_name}/#{repo_path}")
       spinner.success
       object
+    ensure
+      spinner.stop
     end
   end
 end
