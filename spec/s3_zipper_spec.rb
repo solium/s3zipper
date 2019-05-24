@@ -1,9 +1,16 @@
+# frozen_string_literal: true
+
 RSpec.describe S3Zipper do
+  before :all do
+    ENV['AWS_REGION']            = 'us-west-2'
+    ENV['AWS_ACCESS_KEY_ID']     = '123456789'
+    ENV['AWS_SECRET_ACCESS_KEY'] = '123456789abcdefg'
+  end
   let(:fake_s3) { {} }
   let(:client) do
     client = Aws::S3::Client.new(stub_responses: true)
     client.stub_responses(
-      :create_bucket, ->(context) {
+      :create_bucket, lambda { |context|
       name = context.params[:bucket]
       if fake_s3[name]
         'BucketAlreadyExists' # standalone strings are treated as exceptions
@@ -14,14 +21,14 @@ RSpec.describe S3Zipper do
     }
     )
     client.stub_responses(
-      :get_object, ->(context) {
+      :get_object, lambda { |context|
       bucket     = context.params[:bucket]
       key        = context.params[:key]
       b_contents = fake_s3[bucket]
       if b_contents
         obj = b_contents[key]
         if obj
-          { body: SecureRandom.random_bytes(1004979) }
+          { body: SecureRandom.random_bytes(1_004_979) }
         else
           'NoSuchKey'
         end
@@ -31,7 +38,7 @@ RSpec.describe S3Zipper do
     }
     )
     client.stub_responses(
-      :put_object, ->(context) {
+      :put_object, lambda { |context|
       bucket     = context.params[:bucket]
       key        = context.params[:key]
       body       = context.params[:body]
@@ -47,86 +54,124 @@ RSpec.describe S3Zipper do
     client
   end
   let!(:bucket_name) { 'test' }
+  let!(:zip_bucket_name) { 'zip_test' }
   let!(:bucket) { client.create_bucket(bucket: bucket_name) }
-  let(:keys) {
+  let!(:zip_bucket) { client.create_bucket(bucket: zip_bucket_name) }
+  let(:keys) do
     (0..99).map do |n|
       client.put_object(bucket: bucket_name, key: n.to_s, body: n.to_s)
       n.to_s
     end
-  }
+  end
   let(:fake_keys) { (100..199).map(&:to_s) }
   let(:zipper) { described_class.new(bucket_name, client: client) }
-  it "has a version number" do
+  let(:multi_bucket_zipper) { described_class.new(bucket_name, client: client, zip_bucket: zip_bucket) }
+  it 'has a version number' do
     expect(S3Zipper::VERSION).not_to be nil
   end
 
-  describe "#zip_to_local_file" do
+  describe 'zips to different bucket' do
+    it 'zips all files' do
+      result = multi_bucket_zipper.zip_to_s3(keys, filename: 'test')
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   []
+                        )
+    end
+
+    it 'zips some files' do
+      result = multi_bucket_zipper.zip_to_s3(keys + fake_keys, filename: 'test')
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   fake_keys
+                        )
+    end
+
+    it 'zips no files' do
+      result = multi_bucket_zipper.zip_to_s3(fake_keys, filename: 'test')
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 22,
+                          zipped:   [],
+                          failed:   fake_keys
+                        )
+    end
+  end
+
+  describe '#zip_to_local_file' do
     it 'zips all files' do
       result = zipper.zip_to_local_file(keys, file: 'test')
-      expect(result).to eq({
-                             filename: 'test.zip',
-                             filesize: 100536902,
-                             zipped:   keys,
-                             failed:   []
-                           })
+      expect(result).to eq(
+                          filename: 'test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   []
+                        )
       File.delete(result[:filename])
     end
 
     it 'zips some files' do
       result = zipper.zip_to_local_file(keys + fake_keys, file: 'test')
-      expect(result).to eq({
-                             filename: 'test.zip',
-                             filesize: 100536902,
-                             zipped:   keys,
-                             failed:   fake_keys
-                           })
+      expect(result).to eq(
+                          filename: 'test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   fake_keys
+                        )
       File.delete(result[:filename])
     end
 
     it 'zips no files' do
       result = zipper.zip_to_local_file(fake_keys, file: 'test')
-      expect(result).to eq({
-                             filename: 'test.zip',
-                             filesize: 22,
-                             zipped:   [],
-                             failed:   fake_keys
-                           })
+      expect(result).to eq(
+                          filename: 'test.zip',
+                          filesize: 22,
+                          zipped:   [],
+                          failed:   fake_keys
+                        )
       File.delete(result[:filename])
     end
   end
 
-  describe "#zip_to_s3" do
+  describe '#zip_to_s3' do
     it 'zips all files' do
       result = zipper.zip_to_s3(keys, filename: 'test')
-      expect(result).to eq({
-                             key:      'test.zip',
-                             url:      "https://test.s3.us-west-2.amazonaws.com/test.zip",
-                             filesize: 100536902,
-                             zipped:   keys,
-                             failed:   []
-                           })
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   []
+                        )
     end
 
     it 'zips some files' do
       result = zipper.zip_to_s3(keys + fake_keys, filename: 'test')
-      expect(result).to eq({
-                             key:      'test.zip',
-                             url:      "https://test.s3.us-west-2.amazonaws.com/test.zip",
-                             filesize: 100536902,
-                             zipped:   keys,
-                             failed:   fake_keys
-                           })
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 100_536_902,
+                          zipped:   keys,
+                          failed:   fake_keys
+                        )
     end
 
     it 'zips no files' do
       result = zipper.zip_to_s3(fake_keys, filename: 'test')
-      expect(result).to eq({
-                             key:      'test.zip',
-                             url:      "https://test.s3.us-west-2.amazonaws.com/test.zip",
-                             filesize: 22,
-                             zipped:   [],
-                             failed:   fake_keys
-                           })
+      expect(result).to eq(
+                          key:      'test.zip',
+                          url:      'https://test.s3.us-west-2.amazonaws.com/test.zip',
+                          filesize: 22,
+                          zipped:   [],
+                          failed:   fake_keys
+                        )
     end
   end
 end
