@@ -46,6 +46,7 @@ class S3Zipper
   def zip_to_s3(keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block)
     filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false, &block)
+    fdsafadsfadsfasfasfsafasdf
     client.upload(result.delete(:filename), filename, options: s3_options)
     result[:key] = filename
     result[:url] = client.get_url(result[:key])
