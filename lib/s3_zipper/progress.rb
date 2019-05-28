@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'ruby-progressbar'
-require 'tty-spinner'
+require "ruby-progressbar"
+require "tty-spinner"
 class Progress
-  def initialize(options = {})
+  def initialize options = {}
     return unless options[:enabled] || true
 
     @options      = options
@@ -11,7 +11,7 @@ class Progress
     @progress_bar = ProgressBar.create(@options)
   end
 
-  def reset(title: nil, total: nil, format: nil)
+  def reset title: nil, total: nil, format: nil
     return unless @progress_bar
 
     @progress_bar.progress = 0
@@ -30,7 +30,7 @@ class Progress
   def percentage
     return unless @progress_bar
 
-    @progress_bar.to_h['percentage']
+    @progress_bar.to_h["percentage"]
   end
 
   def refresh
@@ -45,24 +45,24 @@ class Progress
     @progress_bar.progress
   end
 
-  def increment(attrs)
+  def increment attrs
     return unless @progress_bar
 
     @progress_bar.increment
     update_attrs(attrs) if attrs
   end
 
-  def update_attrs(attrs)
+  def update_attrs attrs
     attrs.each(&method(:update))
   end
 
-  def update(attr, value)
+  def update attr, value
     return unless @progress_bar
 
     @progress_bar.send("#{attr}=", value)
   end
 
-  def finish(title: nil, format: nil)
+  def finish title: nil, format: nil
     return unless @progress_bar
 
     @progress_bar.title  = title if title
@@ -74,7 +74,7 @@ class Progress
     @progress_bar = nil
   end
 
-  def get_attr(attr)
+  def get_attr attr
     return unless @progress_bar
 
     @progress_bar.send(attr)
