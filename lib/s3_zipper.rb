@@ -2,6 +2,7 @@
 
 require "s3_zipper/version"
 require "s3_zipper/progress"
+require "s3_zipper/spinner"
 require "s3_zipper/client"
 require "zip"
 
@@ -61,9 +62,7 @@ class S3Zipper
   # @yield [progress]
   # @return [Hash]
   def zip keys, path
-    total = progress.total || 0
-    total += keys.size
-    progress.update_attrs total: total, title: "Zipping Keys to #{path}"
+    progress.reset total: keys.size, title: "Zipping Keys to #{path}"
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
       @failed, @successful = client.download_keys keys do |file, key|
         progress.increment title: "Zipping #{key} to #{path}"
@@ -73,6 +72,7 @@ class S3Zipper
         zipfile.add(File.basename(key), file.path)
       end
     end
+    progress.finish(title: "Zipped keys to #{path}")
     @successful.each { |_, temp| temp.unlink }
     {
       filename: path,

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require "ruby-progressbar"
-require "tty-spinner"
 class Progress
+
   def initialize options = {}
     return unless options[:enabled] || true
 
@@ -15,10 +15,16 @@ class Progress
     return unless @progress_bar
 
     @progress_bar.progress = 0
-    @progress_bar.title    = title
-    @progress_bar.total    = total
-    @progress_bar.format   = format
+    @progress_bar.title    = title if title
+    @progress_bar.total    = total if total
+    @progress_bar.format   = format if format
     refresh
+  end
+
+  def spin
+    until @progress_bar.finished?
+      increment
+    end
   end
 
   def total
@@ -45,11 +51,11 @@ class Progress
     @progress_bar.progress
   end
 
-  def increment attrs
+  def increment attrs = {}
     return unless @progress_bar
 
     @progress_bar.increment
-    update_attrs(attrs) if attrs
+    update_attrs(attrs) unless attrs.empty?
   end
 
   def update_attrs attrs

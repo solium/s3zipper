@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require "aws-sdk-s3"
-require "tty-spinner"
-
 class S3Zipper
   class Client
     attr_accessor :bucket_name, :client, :options, :resource, :pb
@@ -57,15 +55,14 @@ class S3Zipper
     end
 
     def upload local_path, repo_path, options: {}
-      spinner = TTY::Spinner.new("[:spinner] :title", format: :dots_2)
-      spinner.update(title: "Uploading zip to #{bucket_name}/#{repo_path}")
-      spinner.auto_spin
+      spinner = Spinner.new(
+        enabled: options[:progress],
+        title:   "Uploading zip to #{bucket_name}/#{repo_path}",
+      )
+      spinner.start
       object = client.put_object(options.merge!(bucket: bucket_name, key: repo_path, body: File.open(local_path).read))
-      spinner.update(title: "Uploaded zip to #{bucket_name}/#{repo_path}")
-      spinner.success
+      spinner.finish title: "Uploaded zip to #{bucket_name}/#{repo_path}"
       object
-    rescue StandardError => e
-      spinner.error(e.message)
     end
   end
 end
