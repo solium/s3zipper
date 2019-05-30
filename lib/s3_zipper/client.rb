@@ -1,5 +1,6 @@
-require 'aws-sdk-s3'
+# frozen_string_literal: true
 
+require "aws-sdk-s3"
 class S3Zipper
   class Client
     attr_accessor :bucket_name, :client, :options, :resource, :pb
@@ -42,18 +43,26 @@ class S3Zipper
       temp.binmode
       temp = download_to_file key, temp
       return if temp.nil?
+
       yield(temp) if block_given?
       temp
     ensure
       temp&.unlink if cleanup
     end
 
-    def get_url(key)
+    def get_url key
       resource.bucket(bucket_name).object(key).public_url
     end
 
     def upload local_path, repo_path, options: {}
-      client.put_object(options.merge!(bucket: bucket_name, key: repo_path, body: File.open(local_path).read))
+      spinner = Spinner.new(
+        enabled: options[:progress],
+        title:   "Uploading zip to #{bucket_name}/#{repo_path}",
+      )
+      spinner.start
+      object = client.put_object(options.merge!(bucket: bucket_name, key: repo_path, body: File.open(local_path).read))
+      spinner.finish title: "Uploaded zip to #{bucket_name}/#{repo_path}"
+      object
     end
   end
 end

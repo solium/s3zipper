@@ -1,0 +1,174 @@
+inherit_from: .rubocop_todo.yml
+###################### CONFIGURATION ######################
+
+AllCops:
+  StyleGuideBaseURL: "https://github.com/capshareinc/capshare/blob/master/doc/style_guide/ruby.md"
+  TargetRubyVersion: 2.3
+  DisplayStyleGuide: true
+  DisabledByDefault: true
+
+Rails:
+  Enabled: true
+
+###################### LAYOUT ######################
+
+Layout/AccessModifierIndentation:
+  Enabled: true
+  StyleGuide: "#indent-access-assignment"
+
+Layout/AlignArray:
+  Enabled: true
+
+Layout/CaseIndentation:
+  Enabled: true
+  StyleGuide: "#indent-when-as-case"
+
+Layout/DotPosition:
+  Enabled: true
+  EnforcedStyle: leading
+
+Layout/DefEndAlignment:
+  Enabled: true
+
+Layout/ElseAlignment:
+  Enabled: true
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: true
+  EnforcedStyle: no_empty_lines
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: true
+
+Layout/EmptyLines:
+  Enabled: true
+
+Layout/SpaceBeforeBlockBraces:
+  Enabled: true
+  StyleGuide: "#spaces-operators"
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: true
+  StyleGuide: "#spaces-operators"
+
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Layout/InitialIndentation:
+  Enabled: true
+
+Layout/MultilineArrayBraceLayout:
+  Enabled: true
+  EnforcedStyle: symmetrical
+
+Layout/MultilineBlockLayout:
+  Enabled: true
+
+Layout/SpaceAfterMethodName:
+  Enabled: true
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: true
+
+Layout/IndentationConsistency:
+  Enabled: true
+
+Layout/TrailingBlankLines:
+  Enabled: true
+
+Layout/TrailingWhitespace:
+  Enabled: true
+  StyleGuide: "#trailing-whitespace"
+
+Layout/AlignParameters:
+  Enabled: true
+
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: true
+  EnforcedStyle: symmetrical
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: aligned
+
+Layout/SpaceAfterComma:
+  Enabled: true
+  StyleGuide: "#spaces-operators"
+
+Layout/SpaceAroundOperators:
+  Enabled: true
+  StyleGuide: "#spaces-operators"
+
+Layout/SpaceBeforeComma:
+  Enabled: true
+  StyleGuide: "##no-space-before-commas"
+
+Layout/SpaceAroundBlockParameters:
+  Enabled: true
+  StyleGuide: "#spaces-block-params"
+
+Layout/SpaceAfterNot:
+  Enabled: true
+  StyleGuide: "#no-space-after-!"
+
+Layout/SpaceInsideRangeLiteral:
+  Enabled: true
+  StyleGuide: "#no-spaces-range-literals"
+
+Layout/SpaceInsideStringInterpolation:
+  Enabled: true
+  StyleGuide: "#no-spaces-string-interpolation"
+
+Layout/IndentFirstHashElement:
+  Enabled: true
+  EnforcedStyle: consistent
+
+Layout/AlignHash:
+  Enabled: true
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+
+
+###################### Style ######################
+
+Style/RedundantReturn:
+  Enabled: true
+
+Style/RedundantSelf:
+  Enabled: true
+
+Style/MethodDefParentheses:
+  Enabled: true
+  EnforcedStyle: require_no_parentheses
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/TrailingCommaInArguments:
+  Enabled: true
+  EnforcedStyleForMultiline: comma
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+Style/TrailingCommaInArrayLiteral:
+  Enable: true
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommanInHashLiteral:
+  Enable: true
+  EnforcedStyleForMultiline: comma
+
+#Style/MultilineTernaryOperator:
+#  Enable: true
+
+#Style/StringHashKeys:
+#  Enable: true
