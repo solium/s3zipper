@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    s3_zipper (1.0.6)
+    s3_zipper (1.0.7)
       aws-sdk-s3 (~> 1)
       concurrent-ruby (~> 1.1)
       ruby-progressbar (~> 1)
@@ -12,8 +12,8 @@ GEM
   specs:
     ast (2.4.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.167.0)
-    aws-sdk-core (3.53.1)
+    aws-partitions (1.169.0)
+    aws-sdk-core (3.54.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
@@ -21,10 +21,10 @@ GEM
     aws-sdk-kms (1.21.0)
       aws-sdk-core (~> 3, >= 3.53.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.40.0)
+    aws-sdk-s3 (1.41.0)
       aws-sdk-core (~> 3, >= 3.53.0)
       aws-sdk-kms (~> 1)
-      aws-sigv4 (~> 1.0)
+      aws-sigv4 (~> 1.1)
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
     concurrent-ruby (1.1.5)
