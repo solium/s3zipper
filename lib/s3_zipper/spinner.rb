@@ -6,13 +6,13 @@ class S3Zipper
   class Spinner
     include Concurrent::Async
 
-    def initialize title: "", enabled: true, steps: %w[⎺ ⎻ ⎼ ⎽ ⎼ ⎻]
+    def initialize title: "", enabled: true, steps: %w[▸▹▹▹▹▹ ▹▸▹▹▹▹ ▹▹▸▹▹▹ ▹▹▹▸▹▹ ▹▹▹▹▸▹ ▹▹▹▹▹▸ ▹▹▹▹▹]
       return unless enabled || true
 
       @progress_bar = ProgressBar.create(
-        format:                           "[%i] %t",
+        format:                           "[%B] %t",
         total:                            nil,
-        length:                           97,
+        length:                           100,
         title:                            title,
         autofinish:                       false,
         unknown_progress_animation_steps: steps,
@@ -37,6 +37,7 @@ class S3Zipper
       return unless @progress_bar
       until @progress_bar.finished?
         increment
+        sleep(2)
       end
     end
 
