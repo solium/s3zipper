@@ -106,6 +106,16 @@ RSpec.describe S3Zipper do
   end
 
   describe "#zip_to_local_file" do
+    it "handles duplicate files" do
+      result = zipper.zip_to_local_file(keys + keys, file: "test")
+      Zip::File.open(result[:filename]) do |zip_file|
+        keys.each do |key|
+          expect(zip_file.find_entry(key)).not_to be_nil
+          expect(zip_file.find_entry("#{File.basename(key, ".*")}(0)#{File.extname(key)}")).not_to be_nil
+        end
+      end
+    end
+
     it "zips all files" do
       result = zipper.zip_to_local_file(keys, file: "test")
       expect(result).to eq(
