@@ -30,7 +30,7 @@ class S3Zipper
   def zip_to_local_file keys, file: SecureRandom.hex
     yield(wrapper) if block_given?
     file = file.is_a?(File) ? file : File.open("#{file}.zip", "w")
-    zip(keys, file.path, &block)
+    zip(keys, file.path)
   end
 
   # Zips files from s3 to a temporary zip
@@ -40,7 +40,7 @@ class S3Zipper
   def zip_to_tempfile keys, filename: SecureRandom.hex, cleanup: false
     yield(wrapper) if block_given?
     zipfile = Tempfile.new([filename, ".zip"])
-    result  = zip(keys, zipfile.path, &block)
+    result  = zip(keys, zipfile.path)
     zipfile.unlink if cleanup
     result
   end
