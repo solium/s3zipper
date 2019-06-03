@@ -8,7 +8,7 @@ require "zip"
 require "multiblock"
 
 class S3Zipper
-  attr_accessor :client, :options, :progress, :zip_client
+  attr_accessor :client, :options, :progress, :zip_client, :wrapper
 
   # @param [String] bucket - bucket that files exist in
   # @param [Hash] options - options for zipper
@@ -16,6 +16,7 @@ class S3Zipper
   # @return [S3Zipper]
   def initialize bucket, options = {}
     @options    = options
+    @wrapper    = Multiblock.wrapper
     @progress   = Progress.new(enabled: options[:progress], format: "%e %c/%C %t", total: nil, length: 80, autofinish: false)
     @client     = Client.new(bucket, options)
     @zip_client = Client.new(options[:zip_bucket], options) if options[:zip_bucket]
@@ -60,9 +61,14 @@ class S3Zipper
 
   private
 
-  def wrapper
-    return @wrapper if @wrapper
-    @wrapper = Multiblock.wrapper
+  def add_to_zip zipfile, filename, file, n = 0
+    existing_file = zipfile.find_entry(filename)
+    if existing_file
+      filename = "#{File.basename(filename, ".*").split('(').first}(#{n})#{File.extname(filename)}"
+      add_to_zip(zipfile, filename, file, n + 1)
+    else
+      zipfile.add(filename, file.path)
+    end
   end
 
   # @param [Array] keys - Array of s3 keys to zip
@@ -77,12 +83,12 @@ class S3Zipper
         progress.increment title: "Zipping #{key} to #{path}"
         wrapper.call(:progress, progress)
         next if file.nil?
-        zipfile.add(File.basename(key), file.path)
+        add_to_zip(zipfile, File.basename(key), file)
       end
-      @successful.each { |_, temp| temp.unlink }
       progress.finish(title: "Zipped keys to #{path}")
       wrapper.call(:finish, zipfile)
     end
+    @successful.each { |_, temp| temp.unlink }
     {
       filename: path,
       filesize: File.size(path),
