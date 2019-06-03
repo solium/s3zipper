@@ -5,6 +5,7 @@ require "s3_zipper/progress"
 require "s3_zipper/spinner"
 require "s3_zipper/client"
 require "zip"
+require "multiblock"
 
 class S3Zipper
   attr_accessor :client, :options, :progress, :zip_client
@@ -46,16 +47,23 @@ class S3Zipper
   # @param [String, File] filename - Name of file, defaults to a random string
   # @param [String] path - path for file in s3
   # @return [Hash]
-  def zip_to_s3 keys, filename: SecureRandom.hex, path: nil, s3_options: {}, &block
+  def zip_to_s3 keys, filename: SecureRandom.hex, path: nil, s3_options: {}
+    yield(wrapper) if block_given?
     filename = "#{path ? "#{path}/" : ''}#{filename}.zip"
-    result   = zip_to_tempfile(keys, filename: filename, cleanup: false, &block)
+    result   = zip_to_tempfile(keys, filename: filename, cleanup: false)
     zip_client.upload(result.delete(:filename), filename, options: s3_options)
     result[:key] = filename
     result[:url] = client.get_url(result[:key])
+    wrapper.call(:upload, result)
     result
   end
 
   private
+
+  def wrapper
+    return @wrapper if @wrapper
+    @wrapper = Multiblock.wrapper
+  end
 
   # @param [Array] keys - Array of s3 keys to zip
   # @param [String] path - path to zip
@@ -64,20 +72,17 @@ class S3Zipper
   def zip keys, path
     progress.reset total: keys.size, title: "Zipping Keys to #{path}"
     Zip::File.open(path, Zip::File::CREATE) do |zipfile|
+      wrapper.call(:start, zipfile)
       @failed, @successful = client.download_keys keys do |file, key|
         progress.increment title: "Zipping #{key} to #{path}"
-        yield(zipfile, progress) if block_given?
+        wrapper.call(:progress, progress)
         next if file.nil?
-        if zipfile.find_entry(file.path)
-          warn "Duplicate File #{file.path}"
-          next
-        end
-
         zipfile.add(File.basename(key), file.path)
       end
+      @successful.each { |_, temp| temp.unlink }
+      progress.finish(title: "Zipped keys to #{path}")
+      wrapper.call(:finish, zipfile)
     end
-    progress.finish(title: "Zipped keys to #{path}")
-    @successful.each { |_, temp| temp.unlink }
     {
       filename: path,
       filesize: File.size(path),

@@ -4,6 +4,7 @@ PATH
     s3_zipper (1.0.7)
       aws-sdk-s3 (~> 1)
       concurrent-ruby (~> 1.1)
+      multiblock (~> 0.2.1)
       ruby-progressbar (~> 1)
       rubyzip (>= 1.0.0)
 
@@ -12,8 +13,8 @@ GEM
   specs:
     ast (2.4.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.169.0)
-    aws-sdk-core (3.54.0)
+    aws-partitions (1.170.0)
+    aws-sdk-core (3.54.1)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
@@ -33,6 +34,7 @@ GEM
     jaro_winkler (1.5.2)
     jmespath (1.4.0)
     json (2.2.0)
+    multiblock (0.2.1)
     parallel (1.17.0)
     parser (2.6.3.0)
       ast (~> 2.4.0)
