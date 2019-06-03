@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    s3_zipper (1.0.7)
+    s3_zipper (1.0.8)
       aws-sdk-s3 (~> 1)
       concurrent-ruby (~> 1.1)
       multiblock (~> 0.2.1)
