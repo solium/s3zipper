@@ -46,6 +46,25 @@ zipper.zip_to_s3(keys)
 # }
 ```
 
+### Event Handling
+```ruby
+keys = ["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"]
+zipper.zip_to_s3 keys do
+  on.start { puts 'Starting to zip' }
+  on.progress { |progress| puts progress.percentage }
+  on.finish { puts 'Finished zipping' }
+  on.upload { puts 'Upload complete' }
+end
+# {
+#   :key=>"3dc29e9ba0a069eb5d0783f07b12e1b3.zip", 
+#   :url => "https://bucket_name.s3.us-west-2.amazonaws.com/35b6f0e2ee91aa0e3c0640c7a4b2b7db.zip" 
+#   :zipped=>["documents/files/790/306/985/original/background-10.jpg", "documents/files/790/307/076/original/background-10.jpg"], 
+#   :failed=>[]
+# }
+```
+
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -54,7 +73,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/s3_zipper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/capshareinc/s3_zipper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
