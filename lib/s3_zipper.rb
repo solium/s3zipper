@@ -27,7 +27,8 @@ class S3Zipper
   # @param [Array] keys - Array of s3 keys to zip
   # @param [String, File] file - Filename or file object for the zip, defaults to a random string
   # @return [Hash]
-  def zip_to_local_file keys, file: SecureRandom.hex, &block
+  def zip_to_local_file keys, file: SecureRandom.hex
+    yield(wrapper) if block_given?
     file = file.is_a?(File) ? file : File.open("#{file}.zip", "w")
     zip(keys, file.path, &block)
   end
@@ -36,7 +37,8 @@ class S3Zipper
   # @param [Array] keys - Array of s3 keys to zip
   # @param [String, File] filename - Name of file, defaults to a random string
   # @return [Hash]
-  def zip_to_tempfile keys, filename: SecureRandom.hex, cleanup: false, &block
+  def zip_to_tempfile keys, filename: SecureRandom.hex, cleanup: false
+    yield(wrapper) if block_given?
     zipfile = Tempfile.new([filename, ".zip"])
     result  = zip(keys, zipfile.path, &block)
     zipfile.unlink if cleanup
