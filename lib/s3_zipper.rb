@@ -68,6 +68,7 @@ class S3Zipper
         progress.increment title: "Zipping #{key} to #{path}"
         yield(zipfile, progress) if block_given?
         next if file.nil?
+        next if zipfile.find_entry(file.path)
 
         zipfile.add(File.basename(key), file.path)
       end
