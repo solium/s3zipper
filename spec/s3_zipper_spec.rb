@@ -65,7 +65,7 @@ RSpec.describe S3Zipper do
   end
   let(:fake_keys) { (100..199).map(&:to_s) }
   let(:zipper) { described_class.new(bucket_name, client: client) }
-  let(:multi_bucket_zipper) { described_class.new(bucket_name, client: client, zip_bucket: zip_bucket) }
+  let(:multi_bucket_zipper) { described_class.new(bucket_name, client: client, zip_bucket: zip_bucket_name) }
   it "has a version number" do
     expect(S3Zipper::VERSION).not_to be nil
   end
