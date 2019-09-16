@@ -56,7 +56,7 @@ class S3Zipper
     result   = zip_to_tempfile(keys, filename: filename, cleanup: false)
     zip_client.upload(result.delete(:filename), filename, options: s3_options)
     result[:key] = filename
-    result[:url] = client.get_url(result[:key])
+    result[:url] = zip_client.get_url(result[:key])
     wrapper.call(:upload, result)
     result
   end
