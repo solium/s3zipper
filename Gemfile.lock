@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    s3_zipper (1.0.8)
+    s3_zipper (1.0.9)
       aws-sdk-s3 (~> 1)
       concurrent-ruby (~> 1.1)
       multiblock (~> 0.2.1)
@@ -13,8 +13,8 @@ GEM
   specs:
     ast (2.4.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.170.0)
-    aws-sdk-core (3.54.1)
+    aws-partitions (1.171.0)
+    aws-sdk-core (3.54.2)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
