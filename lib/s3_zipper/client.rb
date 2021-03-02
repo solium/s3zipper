@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "aws-sdk-s3"
+require "aws-sdk"
+
 class S3Zipper
   class Client
     attr_accessor :bucket_name, :client, :options, :resource, :pb
